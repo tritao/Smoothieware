@@ -57,6 +57,9 @@ extern "C" uint32_t  __end__;
 extern "C" uint32_t  __malloc_free_list;
 extern "C" uint32_t  _sbrk(int size);
 
+#if defined(_MSC_VER)
+#define strncasecmp(x,y,z) _strnicmp(x,y,z)
+#endif
 
 // command lookup table
 const SimpleShell::ptentry_t SimpleShell::commands_table[] = {
@@ -323,8 +326,12 @@ extern SDFAT mounter;
 
 void SimpleShell::remount_command( string parameters, StreamOutput *stream )
 {
+#ifndef DISABLESD
     mounter.remount();
     stream->printf("remounted\r\n");
+#else
+    stream->printf("SD card disabled.\r\n");
+#endif
 }
 
 // Delete a file
@@ -577,6 +584,7 @@ void SimpleShell::save_command( string parameters, StreamOutput *stream )
 // show free memory
 void SimpleShell::mem_command( string parameters, StreamOutput *stream)
 {
+#if !defined(SIM)
     bool verbose = shift_parameter( parameters ).find_first_of("Vv") != string::npos;
     unsigned long heap = (unsigned long)_sbrk(0);
     unsigned long m = g_maximumHeapAddress - heap;
@@ -592,10 +600,14 @@ void SimpleShell::mem_command( string parameters, StreamOutput *stream)
     }
 
     stream->printf("Block size: %u bytes\n", sizeof(Block));
+#endif
 }
 
 static uint32_t getDeviceType()
 {
+#if defined(SIM)
+    return 0;
+#else
 #define IAP_LOCATION 0x1FFF1FF1
     uint32_t command[1];
     uint32_t result[5];
@@ -610,6 +622,7 @@ static uint32_t getDeviceType()
     __enable_irq();
 
     return result[1];
+#endif
 }
 
 // get network config
@@ -1098,7 +1111,7 @@ void SimpleShell::test_command( string parameters, StreamOutput *stream)
         }
 
         uint32_t sps= strtol(stepspersec.c_str(), NULL, 10);
-        sps= std::max(sps, 1UL);
+        sps= std::max(sps, 1U);
 
         uint32_t delayus= 1000000.0F / sps;
         for(int s= 0;s<steps;s++) {

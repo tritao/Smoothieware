@@ -1470,6 +1470,9 @@ __STATIC_INLINE void NVIC_DecodePriority (uint32_t Priority, uint32_t PriorityGr
   *pSubPriority     = (Priority                   ) & ((1 << (SubPriorityBits    )) - 1);
 }
 
+#if defined(SIM)
+#define __DSB()
+#endif
 
 /** \brief  System Reset
 

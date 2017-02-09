@@ -10,6 +10,10 @@
 #ifndef RINGBUFFER_H
 #define RINGBUFFER_H
 
+#if defined(SIM)
+#define __disable_irq()
+#define __enable_irq()
+#endif
 
 template<class kind, int length> class RingBuffer {
     public:
@@ -31,7 +35,9 @@ template<class kind, int length> class RingBuffer {
         volatile int          head;
 };
 
+#if !defined(SIM)
 #include "sLPC17xx.h"
+#endif
 
 template<class kind, int length> RingBuffer<kind, length>::RingBuffer(){
     this->tail = this->head = 0;

@@ -5,8 +5,9 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-using namespace std;
 #include <vector>
+using namespace std;
+
 #include "libs/nuts_bolts.h"
 #include "libs/Module.h"
 #include "libs/Kernel.h"
@@ -29,10 +30,12 @@ SlowTicker::SlowTicker(){
     // ISP button FIXME: WHy is this here?
     ispbtn.from_string("2.10")->as_input()->pull_up();
 
+#if !defined(SIM)
     LPC_SC->PCONP |= (1 << 22);     // Power Ticker ON
     LPC_TIM2->MCR = 3;              // Match on MR0, reset on MR0
     // do not enable interrupt until setup is complete
     LPC_TIM2->TCR = 0;              // Disable interrupt
+#endif
 
     max_frequency = 5;  // initial max frequency is set to 5Hz
     set_frequency(max_frequency);
@@ -41,8 +44,10 @@ SlowTicker::SlowTicker(){
 
 void SlowTicker::start()
 {
+#if !defined(SIM)
     LPC_TIM2->TCR = 1;              // Enable interrupt
     NVIC_EnableIRQ(TIMER2_IRQn);    // Enable interrupt handler
+#endif
 }
 
 void SlowTicker::on_module_loaded(){
@@ -52,9 +57,11 @@ void SlowTicker::on_module_loaded(){
 // Set the base frequency we use for all sub-frequencies
 void SlowTicker::set_frequency( int frequency ){
     this->interval = (SystemCoreClock >> 2) / frequency;   // SystemCoreClock/4 = Timer increments in a second
+#if !defined(SIM)
     LPC_TIM2->MR0 = this->interval;
     LPC_TIM2->TCR = 3;  // Reset
     LPC_TIM2->TCR = 1;  // Reset
+#endif
     flag_1s_count= SystemCoreClock>>2;
 }
 
@@ -88,6 +95,11 @@ void SlowTicker::tick(){
         __debugbreak();
 
 }
+
+#if defined(SIM)
+#define __disable_irq()
+#define __enable_irq()
+#endif
 
 bool SlowTicker::flag_1s(){
     // atomic flag check routine

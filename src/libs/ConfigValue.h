@@ -8,6 +8,7 @@
 #ifndef CONFIGVALUE_H
 #define CONFIGVALUE_H
 
+#include <cstdint>
 #include <string>
 using std::string;
 

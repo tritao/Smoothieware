@@ -5,8 +5,8 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-using namespace std;
 #include <vector>
+using namespace std;
 
 #include "mri.h"
 #include "nuts_bolts.h"

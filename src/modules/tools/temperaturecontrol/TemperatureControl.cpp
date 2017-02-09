@@ -336,7 +336,7 @@ void TemperatureControl::on_gcode_received(void *argument)
 
                 if (v == 0.0) {
                     this->target_temperature = UNDEFINED;
-                    this->heater_pin.set((this->o = 0));
+                    this->heater_pin.set((this->o = 0) != 0);
                 } else {
                     this->set_desired_temperature(v);
                     // wait for temp to be reached, no more gcodes will be fetched until this is complete
@@ -442,7 +442,7 @@ void TemperatureControl::set_desired_temperature(float desired_temperature)
     target_temperature = desired_temperature;
     if (desired_temperature <= 0.0F){
         // turning it off
-        heater_pin.set((this->o = 0));
+        heater_pin.set((this->o = 0) != 0);
 
     }else if(last_target_temperature <= 0.0F) {
         // if it was off and we are now turning it on we need to initialize
@@ -469,7 +469,7 @@ uint32_t TemperatureControl::thermistor_read_tick(uint32_t dummy)
         if (isinf(temperature) || temperature < min_temp || temperature > max_temp) {
             this->temp_violated = true;
             target_temperature = UNDEFINED;
-            heater_pin.set((this->o = 0));
+            heater_pin.set((this->o = 0) != 0);
         } else {
             pid_process(temperature);
         }

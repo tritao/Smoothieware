@@ -897,7 +897,7 @@ void Robot::process_move(Gcode *gcode, enum MOTION_MODE_T motion_mode)
     }
 
     // calculate target in machine coordinates (less compensation transform which needs to be done after segmentation)
-    float target[n_motors];
+    float *target = (float*) alloca(sizeof(float) * n_motors);
     memcpy(target, machine_position, n_motors*sizeof(float));
 
     if(!next_command_is_MCS) {
@@ -1096,9 +1096,9 @@ void Robot::reset_position_from_current_actuator_position()
 // all transforms and is what we actually convert to actuator positions
 bool Robot::append_milestone(const float target[], float rate_mm_s)
 {
-    float deltas[n_motors];
-    float transformed_target[n_motors]; // adjust target for bed compensation
-    float unit_vec[N_PRIMARY_AXIS];
+    float* deltas = (float*) alloca(sizeof(float) * n_motors);
+    float* transformed_target= (float*) alloca(sizeof(float) * n_motors); // adjust target for bed compensation
+    float* unit_vec = (float*) alloca(sizeof(float) * N_PRIMARY_AXIS);
 
     // unity transform by default
     memcpy(transformed_target, target, n_motors*sizeof(float));
@@ -1245,7 +1245,7 @@ bool Robot::delta_move(const float *delta, float rate_mm_s, uint8_t naxis)
     }
 
     // get the absolute target position, default is current machine_position
-    float target[n_motors];
+    float* target = (float*) alloca(sizeof(float) * n_motors);
     memcpy(target, machine_position, n_motors*sizeof(float));
 
     // add in the deltas to get new target
@@ -1321,8 +1321,8 @@ bool Robot::append_line(Gcode *gcode, const float target[], float rate_mm_s, flo
     bool moved= false;
     if (segments > 1) {
         // A vector to keep track of the endpoint of each segment
-        float segment_delta[n_motors];
-        float segment_end[n_motors];
+        float* segment_delta = (float*) alloca(sizeof(float) * n_motors);
+        float* segment_end = (float*)alloca(sizeof(float) * n_motors);
         memcpy(segment_end, machine_position, n_motors*sizeof(float));
 
         // How far do we move each segment?

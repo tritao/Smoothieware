@@ -9,7 +9,7 @@
 #include "libs/Kernel.h"
 #include "libs/Pin.h"
 #include "mbed.h"
-#include "Modbus.h"
+#include "Modbus/Modbus.h"
 #include "Config.h"
 #include "checksumm.h"
 #include "ConfigValue.h"

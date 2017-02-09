@@ -20,7 +20,7 @@ typedef int FILEHANDLE;
 
 #include <stdio.h>
 
-#if defined(__ARMCC_VERSION) || defined(__ICCARM__)
+#if defined(__ARMCC_VERSION) || defined(__ICCARM__) || defined(SIM)
 typedef int ssize_t;
 typedef long off_t;
 

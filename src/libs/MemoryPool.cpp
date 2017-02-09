@@ -28,13 +28,19 @@ void  operator delete(void* p)
 
 #define offset(x) (((uint8_t*) x) - ((uint8_t*) this->base))
 
-typedef struct __attribute__ ((packed))
+#if defined(_MSC_VER)
+#define PACKED_STRUCT(decl) __pragma(pack(push, 1)) decl __pragma(pack(pop))
+#else
+#define PACKED_STRUCT(decl) decl __attribute__ ((packed))
+#endif
+
+PACKED_STRUCT(struct _poolregion
 {
     uint32_t next :31;
     uint32_t used :1;
 
     uint8_t data[];
-} _poolregion;
+});
 
 MemoryPool* MemoryPool::first = NULL;
 
@@ -77,6 +83,10 @@ MemoryPool::~MemoryPool()
 
 void* MemoryPool::alloc(size_t nbytes)
 {
+#if defined(SIM)
+    return malloc(nbytes);
+#endif
+
     // nbytes = ceil(nbytes / 4) * 4
     if (nbytes & 3)
         nbytes += 4 - (nbytes & 3);

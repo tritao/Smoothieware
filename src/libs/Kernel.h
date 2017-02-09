@@ -8,6 +8,12 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
+#if defined(SIM)
+#define __disable_irq()
+#define __enable_irq()
+#define serial_irq_set(a, b, c)
+#endif
+
 #define THEKERNEL Kernel::instance
 #define THECONVEYOR THEKERNEL->conveyor
 #define THEROBOT THEKERNEL->robot
@@ -16,6 +22,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <cstdint>
 
 //Module manager
 class Config;
@@ -23,6 +30,7 @@ class Module;
 class Conveyor;
 class SlowTicker;
 class SerialConsole;
+class SystemConsole;
 class StreamOutputPool;
 class GcodeDispatch;
 class Robot;
@@ -58,6 +66,7 @@ class Kernel {
 
         // These modules are available to all other modules
         SerialConsole*    serial;
+        SystemConsole*    console;
         StreamOutputPool* streams;
         GcodeDispatch*    gcode_dispatch;
         Robot*            robot;

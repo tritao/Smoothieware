@@ -46,7 +46,8 @@ private:
     static const int num_channels= 6;
 #ifdef OVERSAMPLE
     // we need 4^n sample to oversample and we get double that to filter out spikes
-    static const int num_samples= powf(4, OVERSAMPLE)*2;
+    static const int num_samples = 32; //powf(4, OVERSAMPLE) * 2;
+    // buffers storing the last num_samples readings for each channel
 #else
     static const int num_samples= 8;
 #endif

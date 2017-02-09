@@ -113,7 +113,7 @@ void Laser::on_module_loaded()
     this->register_for_event(ON_GET_PUBLIC_DATA);
 
     // no point in updating the power more than the PWM frequency, but no more than 1KHz
-    THEKERNEL->slow_ticker->attach(std::min(1000UL, 1000000/period), this, &Laser::set_proportional_power);
+    THEKERNEL->slow_ticker->attach(std::min(1000U, 1000000/period), this, &Laser::set_proportional_power);
 }
 
 void Laser::on_console_line_received( void *argument )

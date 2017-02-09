@@ -34,8 +34,10 @@ class Pin {
         }
 
         inline Pin* as_input(){
+#ifndef SIM
             if (this->valid)
                 this->port->FIODIR &= ~(1<<this->pin);
+#endif
             return this;
         }
 

@@ -19,6 +19,7 @@
 #include "libs/StepTicker.h"
 #include "libs/PublicData.h"
 #include "modules/communication/SerialConsole.h"
+#include "modules/communication/SystemConsole.h"
 #include "modules/communication/GcodeDispatch.h"
 #include "modules/robot/Planner.h"
 #include "modules/robot/Robot.h"
@@ -69,11 +70,16 @@ Kernel::Kernel(){
 
     this->streams = new StreamOutputPool();
 
+    this->console = new SystemConsole();
+    this->add_module(this->console);
+
     this->current_path   = "/";
 
     // Configure UART depending on MRI config
     // Match up the SerialConsole to MRI UART. This makes it easy to use only one UART for both debug and actual commands.
+#if !defined(SIM)
     NVIC_SetPriorityGrouping(0);
+#endif
 
 #if MRI_ENABLE != 0
     switch( __mriPlatform_CommUartIndex() ) {
@@ -117,6 +123,7 @@ Kernel::Kernel(){
     this->adc = new Adc();
 
     // TODO : These should go into platform-specific files
+#if !defined(SIM)
     // LPC17xx-specific
     NVIC_SetPriorityGrouping(0);
     NVIC_SetPriority(TIMER0_IRQn, 2);
@@ -140,6 +147,7 @@ Kernel::Kernel(){
         NVIC_SetPriority(UART2_IRQn, 5);
         NVIC_SetPriority(UART3_IRQn, 5);
     }
+#endif
 
     // Configure the step ticker
     this->base_stepping_frequency = this->config->value(base_stepping_frequency_checksum)->by_default(100000)->as_number();

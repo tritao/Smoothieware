@@ -34,6 +34,7 @@ typedef int mode_t;
 typedef int ssize_t;
 typedef long off_t;
 
+#elif defined(SIM)
 #else
 #    include <sys/fcntl.h>
 #    include <sys/types.h>

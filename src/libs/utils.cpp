@@ -66,7 +66,7 @@ bool is_alpha(int c)
 {
     if ((c >= 'a') && (c <= 'z')) return true;
     if ((c >= 'A') && (c <= 'Z')) return true;
-    if ((c == '_')) return true;
+    if (c == '_') return true;
     return false;
 }
 
@@ -80,7 +80,7 @@ bool is_numeric(int c)
 {
     if (is_digit(c)) return true;
     if ((c == '.') || (c == '-')) return true;
-    if ((c == 'e')) return true;
+    if (c == 'e') return true;
     return false;
 }
 
@@ -150,7 +150,8 @@ bool file_exists( const string file_name )
     if(lp) {
         exists = true;
     }
-    fclose(lp);
+    if (lp)
+        fclose(lp);
     return exists;
 }
 

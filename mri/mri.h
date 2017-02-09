@@ -20,7 +20,7 @@
 #include <stdint.h>
 
 /* Used to insert hardcoded breakpoint into user's code. */
-#ifndef __debugbreak
+#if !defined(__debugbreak) && !defined(_MSC_VER)
     #define __debugbreak()  { __asm volatile ("bkpt #0"); }
 #endif
 

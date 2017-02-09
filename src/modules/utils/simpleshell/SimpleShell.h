@@ -65,7 +65,7 @@ private:
     typedef struct {
         const char *command;
         const PFUNC func;
-    } const ptentry_t;
+    } ptentry_t;
 
     static const ptentry_t commands_table[];
     static int reset_delay_secs;

@@ -1,8 +1,12 @@
+#ifndef NONETWORK
+
 #ifndef _NETWORK_H
 #define _NETWORK_H
 
 #include "timer.h"
+#ifndef SIM
 #include "LPC17XX_Ethernet.h"
+#endif
 #include "Module.h"
 
 class Sftpd;
@@ -48,5 +52,7 @@ private:
     uint8_t ipmask[4];
     uint8_t ipgw[4];
 };
+
+#endif
 
 #endif

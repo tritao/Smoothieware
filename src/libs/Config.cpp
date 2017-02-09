@@ -5,9 +5,9 @@
       You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-using namespace std;
 #include <vector>
 #include <string>
+using namespace std;
 
 #include "libs/Kernel.h"
 #include "Config.h"
@@ -27,8 +27,10 @@ Config::Config()
 {
     this->config_cache = NULL;
 
+#if !defined(SIM)
     // Config source for firm config found in src/config.default
     this->config_sources.push_back( new FirmConfigSource("firm") );
+#endif
 
     // Config source for */config files
     FileConfigSource *fcs = NULL;

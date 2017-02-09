@@ -26,6 +26,10 @@ THE SOFTWARE.
 
 #include <cstdint>
 
+#if defined(SIM)
+#include <functional>
+#endif  
+
 namespace AjK {
 
 class FPointerDummy;
@@ -79,6 +83,9 @@ protected:
     //! C++ callback object/method pointer (the method part).
     uint32_t (FPointerDummy::*method_callback)(uint32_t);
 
+    //! C++ std::function callback
+    std::function<uint32_t(uint32_t)> func;
+
 public:
     
     /** Constructor
@@ -115,8 +122,9 @@ public:
 */
     template<class T>
     void attach(T* item, uint32_t (T::*method)(uint32_t)) {
-        obj_callback = (FPointerDummy *)item;
-        method_callback = (uint32_t (FPointerDummy::*)(uint32_t))method;
+        //obj_callback = (FPointerDummy *)item;
+        //method_callback = (uint32_t (FPointerDummy::*)(uint32_t))method;
+        //func = std::bind(method, item);
     }
 
     /** call - Overloaded callback initiator.

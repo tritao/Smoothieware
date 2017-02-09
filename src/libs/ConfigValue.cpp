@@ -103,7 +103,7 @@ std::string ConfigValue::as_string()
 bool ConfigValue::as_bool()
 {
     if( this->found == false && this->default_set == true ) {
-        return this->default_int;
+        return this->default_int != 0;
     } else {
         return this->value.find_first_of("ty1") != string::npos;
     }

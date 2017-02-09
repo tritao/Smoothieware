@@ -72,7 +72,7 @@ float Max31855::get_temperature()
 		readings.push_back(temp);
 	}
 
-	if(readings.size()==0) return infinityf();
+	if(readings.size()==0) return INFINITY;
 
 	float sum = 0;
     for (int i=0; i<readings.size(); i++)
@@ -99,7 +99,7 @@ float Max31855::read_temp()
     if (data & 0x0001)
     {
         // Error flag.
-        temperature = infinityf();
+        temperature = INFINITY;
         // Todo: Interpret data2 for more diagnostics.
     }
     else

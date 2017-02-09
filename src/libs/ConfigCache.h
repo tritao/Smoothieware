@@ -8,10 +8,10 @@
 #ifndef CONFIGCACHE_H
 #define CONFIGCACHE_H
 
-using namespace std;
 #include <vector>
-#include <stdint.h>
+#include <cstdint>
 #include <map>
+using namespace std;
 
 class ConfigValue;
 class StreamOutput;

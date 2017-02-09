@@ -36,6 +36,7 @@ StepTicker::StepTicker()
     instance = this; // setup the Singleton instance of the stepticker
 
     // Configure the timer
+#if !defined(SIM)
     LPC_TIM0->MR0 = 10000000;       // Initial dummy value for Match Register
     LPC_TIM0->MCR = 3;              // Match on MR0, reset on MR0
     LPC_TIM0->TCR = 0;              // Disable interrupt
@@ -44,6 +45,7 @@ StepTicker::StepTicker()
     LPC_TIM1->MR0 = 1000000;
     LPC_TIM1->MCR = 5;              // match on Mr0, stop on match
     LPC_TIM1->TCR = 0;              // Disable interrupt
+#endif
 
     // Default start values
     this->set_frequency(100000);
@@ -69,8 +71,10 @@ StepTicker::~StepTicker()
 //called when everything is setup and interrupts can start
 void StepTicker::start()
 {
+#if !defined(SIM)
     NVIC_EnableIRQ(TIMER0_IRQn);     // Enable interrupt handler
     NVIC_EnableIRQ(TIMER1_IRQn);     // Enable interrupt handler
+#endif
     current_tick= 0;
 }
 
@@ -79,17 +83,20 @@ void StepTicker::set_frequency( float frequency )
 {
     this->frequency = frequency;
     this->period = floorf((SystemCoreClock / 4.0F) / frequency); // SystemCoreClock/4 = Timer increments in a second
+#if !defined(SIM)
     LPC_TIM0->MR0 = this->period;
     LPC_TIM0->TCR = 3;  // Reset
     LPC_TIM0->TCR = 1;  // start
+#endif
 }
 
 // Set the reset delay, must be called after set_frequency
 void StepTicker::set_unstep_time( float microseconds )
 {
     uint32_t delay = floorf((SystemCoreClock / 4.0F) * (microseconds / 1000000.0F)); // SystemCoreClock/4 = Timer increments in a second
+#if !defined(SIM)
     LPC_TIM1->MR0 = delay;
-
+#endif
     // TODO check that the unstep time is less than the step period, if not slow down step ticker
 }
 

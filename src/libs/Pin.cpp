@@ -45,7 +45,9 @@ Pin* Pin::from_string(std::string value){
 
             // if strtol read some numbers, cn will point to the first non-digit
             if ((cn > cs) && (pin < 32)){
+#ifndef SIM
                 this->port->FIOMASK &= ~(1 << this->pin);
+#endif
 
                 // now check for modifiers:-
                 // ! = invert pin
@@ -138,6 +140,7 @@ Pin* Pin::pull_none(){
 // Configure this pin as a pullup
 Pin* Pin::pull_up(){
     if (!this->valid) return this;
+#ifndef SIM
     // Set the two bits for this pin as 00
     if( this->port_number == 0 && this->pin < 16  ){ LPC_PINCON->PINMODE0 &= ~(3<<( this->pin    *2)); }
     if( this->port_number == 0 && this->pin >= 16 ){ LPC_PINCON->PINMODE1 &= ~(3<<((this->pin-16)*2)); }
@@ -146,6 +149,7 @@ Pin* Pin::pull_up(){
     if( this->port_number == 2 && this->pin < 16  ){ LPC_PINCON->PINMODE4 &= ~(3<<( this->pin    *2)); }
     if( this->port_number == 3 && this->pin >= 16 ){ LPC_PINCON->PINMODE7 &= ~(3<<((this->pin-16)*2)); }
     if( this->port_number == 4 && this->pin >= 16 ){ LPC_PINCON->PINMODE9 &= ~(3<<((this->pin-16)*2)); }
+#endif
     return this;
 }
 

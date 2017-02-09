@@ -1,6 +1,12 @@
 #ifndef _HEAPRING_H
 #define _HEAPRING_H
 
+#if defined(__GNUC__)
+#define ATTR_WARNING(w) __attribute__ ((warning(w)))
+#else
+#define ATTR_WARNING(w)
+#endif
+
 template<class kind> class HeapRing {
 
     // smoothie-specific friend classes
@@ -20,8 +26,8 @@ public:
     kind& head();
     kind& tail();
 
-    void push_front(kind&) __attribute__ ((warning("Not thread-safe if pop_back() is used in ISR context!"))); // instead, prepare(head_ref()); produce_head();
-    kind& pop_back(void) __attribute__ ((warning("Not thread-safe if head_ref() is used to prepare new items, or push_front() is used in ISR context!"))); // instead, consume(tail_ref()); consume_tail();
+    void push_front(kind&) ATTR_WARNING("Not thread-safe if pop_back() is used in ISR context!"); // instead, prepare(head_ref()); produce_head();
+    kind& pop_back(void) ATTR_WARNING("Not thread-safe if head_ref() is used to prepare new items, or push_front() is used in ISR context!"); // instead, consume(tail_ref()); consume_tail();
 
     /*
      * pointer accessors

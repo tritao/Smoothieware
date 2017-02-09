@@ -236,7 +236,7 @@ void Thermistor::calc_jk()
 
 float Thermistor::get_temperature()
 {
-    if(bad_config) return infinityf();
+    if(bad_config) return INFINITY;
     float t= adc_value_to_temperature(new_thermistor_reading());
     // keep track of min/max for M305
     if(t > max_temp) max_temp= t;
@@ -284,13 +284,13 @@ float Thermistor::adc_value_to_temperature(uint32_t adc_value)
 {
     const uint32_t max_adc_value= THEKERNEL->adc->get_max_value();
     if ((adc_value >= max_adc_value) || (adc_value == 0))
-        return infinityf();
+        return INFINITY;
 
     // resistance of the thermistor in ohms
     float r = r2 / (((float)max_adc_value / adc_value) - 1.0F);
     if (r1 > 0.0F) r = (r1 * r) / (r1 - r);
 
-    if(r > this->r0 * 8) return infinityf(); // 800k is probably open circuit
+    if(r > this->r0 * 8) return INFINITY; // 800k is probably open circuit
 
     float t;
     if(this->use_steinhart_hart) {

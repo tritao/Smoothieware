@@ -74,7 +74,7 @@ float AD8495::adc_value_to_temperature(uint32_t adc_value)
 {
     const uint32_t max_adc_value= THEKERNEL->adc->get_max_value();
     if ((adc_value >= max_adc_value))
-        return infinityf();
+        return INFINITY;
 
     float t=((float)adc_value)/(((float)max_adc_value)/3.3*0.005);
 

@@ -21,7 +21,7 @@ namespace mbed {
 
 Stream::Stream(const char *name) : FileLike(name) {
     /* open ourselves */
-    char buf[12]; /* :0x12345678 + null byte */
+    char buf[32]; /* :0x12345678 + null byte */
     std::sprintf(buf, ":%p", this);
     _file = std::fopen(buf, "w+");
     setbuf(_file, NULL);

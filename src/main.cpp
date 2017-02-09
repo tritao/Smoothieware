@@ -40,15 +40,18 @@
 // #include "libs/ChaNFSSD/SDFileSystem.h"
 #include "libs/nuts_bolts.h"
 #include "libs/utils.h"
+#include "libs/gpio.h"
 
 // Debug
 #include "libs/SerialMessage.h"
 
+#if !defined(SIM)
 #include "libs/USBDevice/USB.h"
 #include "libs/USBDevice/USBMSD/USBMSD.h"
 #include "libs/USBDevice/USBMSD/SDCard.h"
 #include "libs/USBDevice/USBSerial/USBSerial.h"
 #include "libs/USBDevice/DFU.h"
+#endif
 #include "libs/SDFAT.h"
 #include "StreamOutputPool.h"
 #include "ToolManager.h"
@@ -66,21 +69,28 @@
 #define dfu_enable_checksum  CHECKSUM("dfu_enable")
 #define watchdog_timeout_checksum  CHECKSUM("watchdog_timeout")
 
+#ifdef __ARMEL__
+#define AHBSRAM0 __attribute__ ((section ("AHBSRAM0")))
+#else
+#define AHBSRAM0
+#endif
 
+#ifndef DISABLEUSB
 // USB Stuff
-SDCard sd  __attribute__ ((section ("AHBSRAM0"))) (P0_9, P0_8, P0_7, P0_6);      // this selects SPI1 as the sdcard as it is on Smoothieboard
+SDCard sd  AHBSRAM0 (P0_9, P0_8, P0_7, P0_6);      // this selects SPI1 as the sdcard as it is on Smoothieboard
 //SDCard sd(P0_18, P0_17, P0_15, P0_16);  // this selects SPI0 as the sdcard
 //SDCard sd(P0_18, P0_17, P0_15, P2_8);  // this selects SPI0 as the sdcard witrh a different sd select
 
-USB u __attribute__ ((section ("AHBSRAM0")));
-USBSerial usbserial __attribute__ ((section ("AHBSRAM0"))) (&u);
+USB u AHBSRAM0;
+USBSerial usbserial AHBSRAM0;
 #ifndef DISABLEMSD
-USBMSD msc __attribute__ ((section ("AHBSRAM0"))) (&u, &sd);
+USBMSD msc AHBSRAM0 (&u, &sd);
 #else
 USBMSD *msc= NULL;
 #endif
 
-SDFAT mounter __attribute__ ((section ("AHBSRAM0"))) ("sd", &sd);
+SDFAT mounter  ("sd", &sd);
+#endif
 
 GPIO leds[5] = {
     GPIO(P1_18),
@@ -103,14 +113,18 @@ void init() {
     kernel->streams->printf("Smoothie Running @%ldMHz\r\n", SystemCoreClock / 1000000);
     SimpleShell::version_command("", kernel->streams);
 
+    #ifndef DISABLEUSB
     bool sdok= (sd.disk_initialize() == 0);
     if(!sdok) kernel->streams->printf("SDCard failed to initialize\r\n");
+    #else
+    bool sdok= false;
+    #endif
 
     #ifdef NONETWORK
         kernel->streams->printf("NETWORK is disabled\r\n");
     #endif
 
-#ifdef DISABLEMSD
+#if defined(DISABLEMSD) && !defined(DISABLEUSB)
     // attempt to be able to disable msd in config
     if(sdok && !kernel->config->value( disable_msd_checksum )->by_default(true)->as_bool()){
         // HACK to zero the memory USBMSD uses as it and its objects seem to not initialize properly in the ctor
@@ -125,11 +139,13 @@ void init() {
 #endif
 
     // Create and add main modules
+    #ifndef SIM
     kernel->add_module( new(AHB0) Player() );
 
     kernel->add_module( new(AHB0) CurrentControl() );
     kernel->add_module( new(AHB0) KillButton() );
     kernel->add_module( new(AHB0) PlayLed() );
+    #endif
 
     // these modules can be completely disabled in the Makefile by adding to EXCLUDE_MODULES
     #ifndef NO_TOOLS_ENDSTOPS
@@ -190,9 +206,9 @@ void init() {
     #ifndef NO_UTILS_MOTORDRIVERCONTROL
     kernel->add_module( new MotorDriverControl(0) );
     #endif
+#ifndef DISABLEUSB
     // Create and initialize USB stuff
     u.init();
-
 #ifdef DISABLEMSD
     if(sdok && msc != NULL){
         kernel->add_module( msc );
@@ -200,7 +216,9 @@ void init() {
 #else
     kernel->add_module( &msc );
 #endif
+#endif
 
+#ifndef DISABLEUSB
     kernel->add_module( &usbserial );
     if( kernel->config->value( second_usb_serial_enable_checksum )->by_default(false)->as_bool() ){
         kernel->add_module( new(AHB0) USBSerial(&u) );
@@ -209,6 +227,7 @@ void init() {
     if( kernel->config->value( dfu_enable_checksum )->by_default(false)->as_bool() ){
         kernel->add_module( new(AHB0) DFU(&u));
     }
+#endif
 
     // 10 second watchdog timeout (or config as seconds)
     float t= kernel->config->value( watchdog_timeout_checksum )->by_default(10.0F)->as_number();
@@ -220,8 +239,9 @@ void init() {
         kernel->streams->printf("WARNING Watchdog is disabled\n");
     }
 
-
+#ifndef DISABLEUSB
     kernel->add_module( &u );
+#endif
 
     // memory before cache is cleared
     //SimpleShell::print_mem(kernel->streams);

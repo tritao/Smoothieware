@@ -18,12 +18,18 @@
 
 class NullStreamOutput;
 
+#ifdef __GNUC__
+#define PRINTF_FORMAT_STRING __attribute__((format(printf, 2, 3)))
+#else
+#define PRINTF_FORMAT_STRING
+#endif
+
 class StreamOutput {
     public:
         StreamOutput(){}
         virtual ~StreamOutput(){}
 
-        virtual int printf(const char *format, ...) __attribute__ ((format(printf, 2, 3)));
+        virtual int printf(const char *format, ...) PRINTF_FORMAT_STRING;
         virtual int _putc(int c) { return 1; }
         virtual int _getc(void) { return 0; }
         virtual int puts(const char* str) = 0;

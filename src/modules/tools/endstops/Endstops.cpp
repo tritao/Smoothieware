@@ -632,7 +632,7 @@ void Endstops::home(axis_bitmap_t a)
         for (size_t i = A_AXIS; i < homing_axis.size(); ++i) {
             if(axis_to_home[i]) {
                 // now home A B or C
-                float delta[i+1];
+                float* delta = (float*) alloca(sizeof(float) * (i+1));
                 for (size_t j = 0; j <= i; ++j) delta[j]= 0;
                 delta[i]= homing_axis[i].max_travel; // we go the max
                 if(homing_axis[i].home_direction) delta[i]= -delta[i];
@@ -654,7 +654,7 @@ void Endstops::home(axis_bitmap_t a)
 
     // Move back a small distance for all homing axis
     this->status = MOVING_BACK;
-    float delta[homing_axis.size()];
+    float* delta = (float*) alloca(sizeof(float) * homing_axis.size());
     for (size_t i = 0; i < homing_axis.size(); ++i) delta[i]= 0;
 
     // use minimum feed rate of all axes that are being homed (sub optimal, but necessary)

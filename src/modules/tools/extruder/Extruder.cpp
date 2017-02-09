@@ -368,7 +368,7 @@ void Extruder::on_gcode_received(void *argument)
 
             if(gcode->g == 10) {
                 // retract
-                float delta[motor_id + 1];
+                float* delta = (float*) alloca(sizeof(float) * (motor_id + 1));
                 for (int i = 0; i < motor_id; ++i) {
                     delta[i] = 0;
                 }
@@ -391,7 +391,7 @@ void Extruder::on_gcode_received(void *argument)
                     THEROBOT->delta_move(delta, retract_zlift_feedrate, 3);
                 }
 
-                float delta[motor_id + 1];
+                float* delta = (float*) alloca(sizeof(float) * (motor_id + 1));
                 for (int i = 0; i < motor_id; ++i) {
                     delta[i] = 0;
                 }

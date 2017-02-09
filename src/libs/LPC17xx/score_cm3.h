@@ -812,6 +812,10 @@ static __INLINE uint32_t SysTick_Config(uint32_t ticks, bool enable_irq)
 
 /* ##################################    Reset function  ############################################ */
 
+#if defined(SIM)
+#define __DSB()
+#endif
+
 /**
  * @brief  Initiate a system reset request.
  *

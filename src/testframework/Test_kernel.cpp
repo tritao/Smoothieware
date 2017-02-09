@@ -20,13 +20,13 @@ This is aprt of the Smoothie test framework, it generates a Mockable Kernl so ke
 #include "checksumm.h"
 #include "ConfigValue.h"
 
+#include "libs/StepperMotor.h"
 #include "libs/StepTicker.h"
 #include "libs/PublicData.h"
 #include "modules/communication/SerialConsole.h"
 #include "modules/communication/GcodeDispatch.h"
 #include "modules/robot/Planner.h"
 #include "modules/robot/Robot.h"
-#include "modules/robot/Stepper.h"
 #include "modules/robot/Conveyor.h"
 
 #include "Config.h"
