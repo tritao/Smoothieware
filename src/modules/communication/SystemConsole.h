@@ -9,22 +9,27 @@ You should have received a copy of the GNU General Public License along with Smo
 #define SYSTEMCONSOLE_H
 
 #include "libs/Module.h"
-#include "Serial.h" // mbed.h lib
-#include "libs/Kernel.h"
+#include "libs/StreamOutput.h"
 #include <vector>
 #include <string>
-using std::string;
-#include "libs/StreamOutput.h"
+#include <thread>
+#include <mutex>
 
 class SystemConsole : public Module, public StreamOutput {
 public:
     SystemConsole();
 
     void on_module_loaded();
+    void on_main_loop(void * argument);
 
+    void thread_main();
     int _putc(int c);
     int _getc(void);
     int puts(const char*);
+
+    std::thread* console_thread;
+    std::vector<std::string> lines;
+    std::mutex lines_mutex;
 };
 
 #endif

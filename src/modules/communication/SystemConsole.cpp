@@ -5,15 +5,11 @@ Smoothie is distributed in the hope that it will be useful, but WITHOUT ANY WARR
 You should have received a copy of the GNU General Public License along with Smoothie. If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <string>
-#include <stdarg.h>
-using std::string;
-#include "libs/Module.h"
-#include "libs/Kernel.h"
-#include "libs/nuts_bolts.h"
 #include "SystemConsole.h"
-#include "libs/StreamOutput.h"
+#include "libs/Kernel.h"
+#include "libs/SerialMessage.h"
 #include "libs/StreamOutputPool.h"
+#include "linenoise/linenoise.h"
 
 SystemConsole::SystemConsole() {
 }
@@ -22,12 +18,37 @@ SystemConsole::SystemConsole() {
 void SystemConsole::on_module_loaded() {
     // Add to the pack of streams kernel can call to, for example for broadcasting
     THEKERNEL->streams->append_stream(this);
+
+    // We only call the command dispatcher in the main loop, nowhere else
+    this->register_for_event(ON_MAIN_LOOP);
+    this->register_for_event(ON_IDLE);
+
+    console_thread = new std::thread(&SystemConsole::thread_main, this);
 }
 
+void SystemConsole::on_main_loop(void * argument) {
+    std::lock_guard<std::mutex> lk(lines_mutex);
+    for (auto line : lines) {
+        struct SerialMessage message;
+        message.message = line;
+        message.stream = this;
+        THEKERNEL->call_event(ON_CONSOLE_LINE_RECEIVED, &message);
+    }
+    lines.clear();
+}
+
+void SystemConsole::thread_main() {
+    char *line;
+    while ((line = linenoise("")) != NULL) {
+        std::lock_guard<std::mutex> lk(lines_mutex);
+        lines.push_back(std::string(line));
+        free(line);
+    }
+}
 
 int SystemConsole::puts(const char* s)
 {
-    return ::puts(s);
+    return ::printf("%s", s);
 }
 
 int SystemConsole::_putc(int c)
