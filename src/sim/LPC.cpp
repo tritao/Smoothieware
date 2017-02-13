@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <ctime>
 #include "port_api.h"
 
 extern "C"
@@ -24,8 +25,13 @@ void FIO_ClearValue() {}
 void FIO_ReadValue() {}
 
 void set_high_on_debug() {}
+
 void wait_us() {}
-void us_ticker_read() {}
+uint32_t us_ticker_read()
+{
+    return clock() * CLOCKS_PER_SEC;
+}
+
 void pwmout_init() {}
 
 // Interrupt controller stubs
