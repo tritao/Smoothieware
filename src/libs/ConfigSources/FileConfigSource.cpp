@@ -74,6 +74,7 @@ void FileConfigSource::transfer_values_to_cache( ConfigCache *cache, const char 
         if(readLine(line, ln++, lp)) {
             // process the config line and store the value in cache
             ConfigValue* cv = process_line_from_ascii_config(line, cache);
+            if (!cv) continue;
 
             // if this line is an include directive then attempt to read the included file
             if(cv->check_sums[0] == include_checksum) {

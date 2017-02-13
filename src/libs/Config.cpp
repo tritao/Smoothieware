@@ -38,6 +38,10 @@ Config::Config()
         fcs = new FileConfigSource("/local/config", "local");
     else if( file_exists("/local/config.txt") )
         fcs = new FileConfigSource("/local/config.txt", "local");
+#if defined(SIM)
+    else if (file_exists("config"))
+        fcs = new FileConfigSource("config", "fs");
+#endif
     if( fcs != NULL ) {
         this->config_sources.push_back( fcs );
         fcs = NULL;
