@@ -9,6 +9,7 @@
 // it first checks if the deleted object is part of a pool, and uses free otherwise.
 void  operator delete(void* p)
 {
+#if !defined(SIM)
     MemoryPool* m = MemoryPool::first;
     while (m)
     {
@@ -22,6 +23,7 @@ void  operator delete(void* p)
     }
 
     MDEBUG("no pool has %p, using free()\n", p);
+#endif
     free(p);
 }
 
