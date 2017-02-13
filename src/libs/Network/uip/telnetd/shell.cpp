@@ -57,6 +57,11 @@ struct ptentry {
 #define SHELL_PROMPT "> "
 
 /*---------------------------------------------------------------------------*/
+
+#if defined(_WIN32) || defined(_WIN64) 
+#define strncasecmp _strnicmp 
+#endif
+
 bool Shell::parse(register char *str, const struct ptentry *t)
 {
     const struct ptentry *p;
@@ -97,6 +102,7 @@ static const char *states[] = {
 };
 static void connections(char *str, Shell *sh)
 {
+#if !defined(SIM)
     char istr[128];
     struct uip_conn *connr;
     snprintf(istr, sizeof(istr), "Initial MSS: %d, MSS: %d\n", uip_initialmss(), uip_mss());
@@ -118,6 +124,7 @@ static void connections(char *str, Shell *sh)
             sh->output(istr);
         }
     }
+#endif
 }
 
 static void quit(char *str, Shell *sh)

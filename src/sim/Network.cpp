@@ -17,6 +17,11 @@
 #include "checksumm.h"
 #include "ConfigValue.h"
 
+#include "StreamOutputPool.h"
+
+#include "telnetd.h"
+#include "shell.h"
+
 #define network_enable_checksum CHECKSUM("enable")
 #define network_webserver_checksum CHECKSUM("webserver")
 #define network_telnet_checksum CHECKSUM("telnet")
@@ -90,6 +95,8 @@ void Network::on_module_loaded()
         return;
     }
 
+    telnet_enabled = THEKERNEL->config->value(network_checksum, network_telnet_checksum, network_enable_checksum)->by_default(false)->as_bool();
+
     THEKERNEL->slow_ticker->attach( 100, this, &Network::tick );
 
     // Register for events
@@ -100,28 +107,64 @@ void Network::on_module_loaded()
     this->init();
 }
 
-void Network::on_get_public_data(void* argument) {
-    PublicDataRequest* pdr = static_cast<PublicDataRequest*>(argument);
+void Network::init(void)
+{
+#if defined(_WIN32)
+    WSADATA wsa;
+    if (WSAStartup(MAKEWORD(2, 2), &wsa) != 0)
+    {
+        printf("Failed to initialize WinSocks. Error Code : %d", WSAGetLastError());
+        return;
+    }
+#endif
 
-    if(!pdr->starts_with(network_checksum)) return;
+    network_thread = new std::thread(&Network::thread_main, this);
+}
 
-    if(pdr->second_element_is(get_ip_checksum)) {
-        pdr->set_data_ptr(this->ipaddr);
-        pdr->set_taken();
+void Network::thread_main(void)
+{
+    socket = new CPassiveSocket();
+    socket->Initialize();
+    socket->Listen("127.0.0.1", 23);
 
-    }else if(pdr->second_element_is(get_ipconfig_checksum)) {
-        // NOTE caller must free the returned string when done
-        char buf[200];
-        int n1= snprintf(buf,             sizeof(buf),         "IP Addr: %d.%d.%d.%d\n", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
-        int n2= snprintf(&buf[n1],       sizeof(buf)-n1,       "IP GW: %d.%d.%d.%d\n", ipgw[0], ipgw[1], ipgw[2], ipgw[3]);
-        int n3= snprintf(&buf[n1+n2],    sizeof(buf)-n1-n2,    "IP mask: %d.%d.%d.%d\n", ipmask[0], ipmask[1], ipmask[2], ipmask[3]);
-        int n4= snprintf(&buf[n1+n2+n3], sizeof(buf)-n1-n2-n3, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n",
-            mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
-        char *str = (char *)malloc(n1+n2+n3+n4+1);
-        memcpy(str, buf, n1+n2+n3+n4);
-        str[n1+n2+n3+n4]= '\0';
-        pdr->set_data_ptr(str);
-        pdr->set_taken();
+    while (socket && socket->IsSocketValid())
+    {
+        CActiveSocket *client = socket->Accept();
+        if (client == nullptr)
+            continue;
+
+        THEKERNEL->streams->printf("New client connected: %s\n", client->GetClientAddr());
+
+        telnetd = new Telnetd();
+        telnetd->socket = client;
+        telnetd->shell->start();
+
+        constexpr int BUF_SIZE = 512;
+        uint8 recv[BUF_SIZE];
+
+        std::vector<uint8_t> data;
+        data.reserve(BUF_SIZE);
+
+        while (true) {
+            int bytes = client->Receive(BUF_SIZE, recv);
+            data.insert(data.end(), &recv[0], &recv[bytes]);
+
+            bool newLine = false;
+            for (auto i = 0; i < bytes; i++)
+                newLine |= data[data.size() - i - 1] == '\n';
+
+            if (newLine)
+            {
+                data.push_back('\0');
+
+                std::string cmd((char*)data.data());
+                cmd.erase(std::remove(cmd.begin(), cmd.end(), '\r'), cmd.end());
+                cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
+
+                telnetd->shell->input((char*) cmd.c_str());
+                data.clear();
+            }
+        }
     }
 }
 
@@ -138,12 +181,8 @@ void Network::on_idle(void *argument)
 
 void Network::setup_servers()
 {
-
-}
-
-void Network::init(void)
-{
-
+    if (telnet_enabled)
+        telnetd = new Telnetd();
 }
 
 void Network::on_main_loop(void *argument)
@@ -156,4 +195,30 @@ void Network::on_main_loop(void *argument)
 
 void Network::handlePacket(void)
 {
+}
+
+void Network::on_get_public_data(void* argument) {
+    PublicDataRequest* pdr = static_cast<PublicDataRequest*>(argument);
+
+    if (!pdr->starts_with(network_checksum)) return;
+
+    if (pdr->second_element_is(get_ip_checksum)) {
+        pdr->set_data_ptr(this->ipaddr);
+        pdr->set_taken();
+
+    }
+    else if (pdr->second_element_is(get_ipconfig_checksum)) {
+        // NOTE caller must free the returned string when done
+        char buf[200];
+        int n1 = snprintf(buf, sizeof(buf), "IP Addr: %d.%d.%d.%d\n", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
+        int n2 = snprintf(&buf[n1], sizeof(buf) - n1, "IP GW: %d.%d.%d.%d\n", ipgw[0], ipgw[1], ipgw[2], ipgw[3]);
+        int n3 = snprintf(&buf[n1 + n2], sizeof(buf) - n1 - n2, "IP mask: %d.%d.%d.%d\n", ipmask[0], ipmask[1], ipmask[2], ipmask[3]);
+        int n4 = snprintf(&buf[n1 + n2 + n3], sizeof(buf) - n1 - n2 - n3, "MAC Address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+            mac_address[0], mac_address[1], mac_address[2], mac_address[3], mac_address[4], mac_address[5]);
+        char *str = (char *)malloc(n1 + n2 + n3 + n4 + 1);
+        memcpy(str, buf, n1 + n2 + n3 + n4);
+        str[n1 + n2 + n3 + n4] = '\0';
+        pdr->set_data_ptr(str);
+        pdr->set_taken();
+    }
 }

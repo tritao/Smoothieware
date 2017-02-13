@@ -1244,8 +1244,10 @@ struct uip_udp_conn {
   u16_t rport;        /**< The remote port number in network byte order. */
   u8_t  ttl;          /**< Default time-to-live. */
 
+#if !defined(SIM)
   /** The application state. */
   uip_udp_appstate_t appstate;
+#endif
 };
 
 /**

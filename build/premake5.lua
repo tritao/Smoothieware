@@ -85,7 +85,9 @@ workspace "Smoothieware"
     files
     {
       "../src/libs/Network/uip/CallbackStream*",
-      "../src/libs/Network/uip/CommandQueue*"
+      "../src/libs/Network/uip/CommandQueue*",
+      "../src/libs/Network/uip/telnetd/shell*",
+      "../src/libs/Network/uip/telnetd/*.h"
     }
 
     local includes =
@@ -101,6 +103,7 @@ workspace "Smoothieware"
       "../src/libs/ChaNFS",
       "../src/libs/ConfigSources",
       "../src/libs/LPC17xx/LPC17xxLib/inc",
+      "../src/libs/Network/uip/telnetd/",
       "../src/libs/USBDevice/USBMSD",
       "../src/modules/communication",
       "../src/modules/communication/utils",
@@ -132,6 +135,7 @@ workspace "Smoothieware"
     }
 
     filter "system:windows"
+      links { "Ws2_32" }
       buildoptions "/wd4200 /wd4244 /wd4267 /wd4302 /wd4305 /wd4311 /wd4312 /wd4838 /wd4996"
       --prebuildcommands { "..\\..\\src\\generate-version.bat" }
 

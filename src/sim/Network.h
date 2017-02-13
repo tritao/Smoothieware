@@ -6,8 +6,12 @@
 #include "timer.h"
 #include "Module.h"
 
+#include "net/PassiveSocket.h"
+#include <thread>
+
 class Sftpd;
 class CommandQueue;
+class Telnetd;
 
 class Network : public Module
 {
@@ -24,6 +28,7 @@ public:
 
     // accessed from C
     Sftpd *sftpd;
+    Telnetd *telnetd;
     struct {
         bool webserver_enabled:1;
         bool telnet_enabled:1;
@@ -31,12 +36,15 @@ public:
         bool use_dhcp:1;
     };
 
+    CPassiveSocket* socket;
+    std::thread *network_thread;
 
 private:
     void init();
     void setup_servers();
     uint32_t tick(uint32_t dummy);
     void handlePacket();
+    void thread_main();
 
     CommandQueue *command_q;
 

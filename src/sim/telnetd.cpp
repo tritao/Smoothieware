@@ -7,10 +7,9 @@
  * are met:
  * 1. Redistributions of source code must retain the above copyright
  *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above
- *    copyright notice, this list of conditions and the following
- *    disclaimer in the documentation and/or other materials provided
- *    with the distribution.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
  * 3. The name of the author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
@@ -29,62 +28,88 @@
  *
  * This file is part of the uIP TCP/IP stack
  *
- * $Id: telnetd.h,v 1.2 2006/06/07 09:43:54 adam Exp $
+ * $Id: telnetd.c,v 1.2 2006/06/07 09:43:54 adam Exp $
  *
  */
-#ifndef __TELNETD_H__
-#define __TELNETD_H__
 
-#include "stdint.h"
+#include "telnetd.h"
+#include "shell.h"
 
-class Shell;
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-#if defined(SIM)
-class CActiveSocket;
-#endif
+#include "net/PassiveSocket.h"
 
-class Telnetd
+void Telnetd::close()
 {
-public:
-    Telnetd();
-    ~Telnetd();
+}
 
-    static void init(void);
-    static void appcall(void);
+int Telnetd::sendline(char *line)
+{
+    return 0;
+}
 
-    void output_prompt(const char *str);
-    int output(const char *str);
-    int can_output();
-    void close();
+void Telnetd::output_prompt(const char *str)
+{
+    if(prompt) output(str);
+}
 
-#if defined(SIM)
-    CActiveSocket *socket;
-#endif
+int Telnetd::output(const char *str)
+{
+    int sent = socket->Send((const uint8 *) str, strlen(str));
+    return sent;
+}
 
-    Shell *shell;
+// check if we can queue or if queue is full
+int Telnetd::can_output()
+{
+    return 0;
+}
 
-private:
-    static const int TELNETD_CONF_MAXCOMMANDLENGTH= 132;
-    static const int TELNETD_CONF_NUMLINES= 32;
+void Telnetd::acked(void)
+{
 
-    // FIXME this needs to be a FIFO
-    char *lines[TELNETD_CONF_NUMLINES];
-    char buf[TELNETD_CONF_MAXCOMMANDLENGTH];
-    char bufptr;
-    uint8_t numsent;
-    uint8_t state;
-    uint16_t rport;
+}
 
-    bool prompt;
+void Telnetd::senddata(void)
+{
 
-    bool first_time;
+}
 
-    int sendline(char *line);
-    void acked(void);
-    void senddata(void);
-    void get_char(uint8_t c);
-    void newdata(void);
-    void poll(void);
-};
+void Telnetd::get_char(uint8_t c)
+{
 
-#endif /* __TELNETD_H__ */
+}
+
+void Telnetd::newdata(void)
+{
+
+}
+
+void Telnetd::poll()
+{
+
+}
+
+Telnetd::Telnetd()
+{
+    shell= new Shell(this);
+}
+
+Telnetd::~Telnetd()
+{
+    delete shell;
+}
+
+// static
+void Telnetd::appcall(void)
+{
+
+}
+
+// static
+void Telnetd::init(void)
+{
+
+}
