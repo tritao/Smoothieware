@@ -30,7 +30,6 @@ workspace "Smoothieware"
       "__STATIC_INLINE=inline",
       "DEFAULT_SERIAL_BAUD_RATE=9600",
       "CHECKSUM_USE_CPP",
-      "NONETWORK",
       "DISABLESD",
       "DISABLEMSD",
       "DISABLEUSB",
@@ -81,6 +80,12 @@ workspace "Smoothieware"
       "../src/libs/Network/**",
       "../src/libs/USBDevice/**",
       "../src/libs/Watchdog*",
+    }
+
+    files
+    {
+      "../src/libs/Network/uip/CallbackStream*",
+      "../src/libs/Network/uip/CommandQueue*"
     }
 
     local includes =

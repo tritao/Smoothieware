@@ -4,9 +4,6 @@
 #define _NETWORK_H
 
 #include "timer.h"
-#ifndef SIM
-#include "LPC17XX_Ethernet.h"
-#endif
 #include "Module.h"
 
 class Sftpd;
@@ -22,8 +19,6 @@ public:
     void on_idle(void* argument);
     void on_main_loop(void* argument);
     void on_get_public_data(void* argument);
-
-#if !defined(SIM)
     void dhcpc_configured(uint32_t ipaddr, uint32_t ipmask, uint32_t ipgw);
     void tapdev_send(void *pPacket, unsigned int size);
 
@@ -35,7 +30,6 @@ public:
         bool plan9_enabled:1;
         bool use_dhcp:1;
     };
-#endif
 
 
 private:
@@ -45,12 +39,6 @@ private:
     void handlePacket();
 
     CommandQueue *command_q;
-
-#if !defined(SIM)
-    LPC17XX_Ethernet *ethernet;
-
-    struct timer periodic_timer, arp_timer;
-#endif
 
     char *hostname;
     volatile uint32_t tickcnt;
