@@ -68,10 +68,28 @@ StepTicker::~StepTicker()
 {
 }
 
+void StepTicker::on_module_loaded()
+{
+    this->register_for_event(ON_IDLE);
+}
+
+void StepTicker::on_idle(void* argument)
+{
+    double elapsed = timer.elapsed() * 1000 * 1000;
+    if (elapsed >= frequency)
+    {
+        timer.reset();
+        step_tick();
+        handle_finish();
+    }
+}
+
 //called when everything is setup and interrupts can start
 void StepTicker::start()
 {
-#if !defined(SIM)
+#if defined(SIM)
+    timer.reset();
+#else
     NVIC_EnableIRQ(TIMER0_IRQn);     // Enable interrupt handler
     NVIC_EnableIRQ(TIMER1_IRQn);     // Enable interrupt handler
 #endif
@@ -93,8 +111,8 @@ void StepTicker::set_frequency( float frequency )
 // Set the reset delay, must be called after set_frequency
 void StepTicker::set_unstep_time( float microseconds )
 {
-    uint32_t delay = floorf((SystemCoreClock / 4.0F) * (microseconds / 1000000.0F)); // SystemCoreClock/4 = Timer increments in a second
 #if !defined(SIM)
+    uint32_t delay = floorf((SystemCoreClock / 4.0F) * (microseconds / 1000000.0F)); // SystemCoreClock/4 = Timer increments in a second
     LPC_TIM1->MR0 = delay;
 #endif
     // TODO check that the unstep time is less than the step period, if not slow down step ticker
@@ -220,8 +238,10 @@ void StepTicker::step_tick (void)
     // right now it takes about 3-4us but if the unstep were near 10uS or greater it would be an issue
     // also it takes at least 2us to get here so even when set to 1us pulse width it will still be about 3us
     if( unstep.any()) {
+#if !defined(SIM)
         LPC_TIM1->TCR = 3;
         LPC_TIM1->TCR = 1;
+#endif
     }
 
 

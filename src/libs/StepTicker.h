@@ -17,6 +17,11 @@
 
 #include "ActuatorCoordinates.h"
 #include "TSRingBuffer.h"
+#include "Module.h"
+
+#if defined(SIM)
+#include "sim/Timer.h"
+#endif
 
 class StepperMotor;
 class Block;
@@ -26,10 +31,14 @@ class Block;
 #define STEPTICKER_TOFP(x) ((int32_t)roundf((float)(x)*STEPTICKER_FPSCALE))
 #define STEPTICKER_FROMFP(x) ((float)(x)/STEPTICKER_FPSCALE)
 
-class StepTicker{
+class StepTicker : public Module {
     public:
         StepTicker();
         ~StepTicker();
+
+        void on_module_loaded();
+        void on_idle(void * argument);
+
         void set_frequency( float frequency );
         void set_unstep_time( float microseconds );
         int register_motor(StepperMotor* motor);
@@ -50,6 +59,10 @@ class StepTicker{
         static StepTicker *instance;
 
         bool start_next_block();
+
+        #if defined(SIM)
+        Timer<std::chrono::microseconds> timer;
+        #endif
 
         float frequency;
         uint32_t period;
