@@ -1,6 +1,10 @@
 #ifndef PIN_H
 #define PIN_H
 
+#if defined(SIM)
+#include "sim/Pin.h"
+#else
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string>
@@ -34,10 +38,8 @@ class Pin {
         }
 
         inline Pin* as_input(){
-#ifndef SIM
             if (this->valid)
                 this->port->FIODIR &= ~(1<<this->pin);
-#endif
             return this;
         }
 
@@ -85,7 +87,7 @@ class Pin {
         };
 };
 
-
+#endif
 
 
 #endif
