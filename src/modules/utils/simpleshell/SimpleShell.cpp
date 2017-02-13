@@ -666,8 +666,12 @@ void SimpleShell::reset_command( string parameters, StreamOutput *stream)
 // go into dfu boot mode
 void SimpleShell::dfu_command( string parameters, StreamOutput *stream)
 {
+#if defined(SIM)
+    stream->printf("Not supported in simulator mode.\r\n");
+#else
     stream->printf("Entering boot mode...\r\n");
     system_reset(true);
+#endif
 }
 
 // Break out into the MRI debugging system
@@ -860,6 +864,9 @@ void SimpleShell::get_command( string parameters, StreamOutput *stream)
     } else if (what == "status") {
         // also ? on serial and usb
         stream->printf("%s\n", THEKERNEL->get_query_string().c_str());
+
+    } else if (what ==  "blocks") {
+        THEKERNEL->conveyor->dump_queue();
 
     } else {
         stream->printf("error:unknown option %s\n", what.c_str());

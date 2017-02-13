@@ -72,7 +72,7 @@ workspace "Smoothieware"
 
     excludes
     {
-      "../src/libs/Watchdog*",
+      "../src/libs/Pin*",
       "../src/libs/ADC/**",
       "../src/libs/ChaNFS/**",
       "../src/libs/ConfigSources/Firm**",
@@ -80,6 +80,7 @@ workspace "Smoothieware"
       "../src/libs/LPC17xx/**",
       "../src/libs/Network/**",
       "../src/libs/USBDevice/**",
+      "../src/libs/Watchdog*",
     }
 
     local includes =

@@ -29,6 +29,7 @@ void SystemConsole::on_module_loaded() {
 void SystemConsole::on_main_loop(void * argument) {
     std::lock_guard<std::mutex> lk(lines_mutex);
     for (auto line : lines) {
+        if (line.empty()) continue;
         struct SerialMessage message;
         message.message = line;
         message.stream = this;
@@ -42,6 +43,7 @@ void SystemConsole::thread_main() {
     while ((line = linenoise("")) != NULL) {
         std::lock_guard<std::mutex> lk(lines_mutex);
         lines.push_back(std::string(line));
+        linenoiseHistoryAdd(line);
         free(line);
     }
 }

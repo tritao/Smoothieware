@@ -120,6 +120,8 @@ Kernel::Kernel(){
     add_module( this->slow_ticker = new SlowTicker());
 
     this->step_ticker = new StepTicker();
+    this->add_module(this->step_ticker);
+
     this->adc = new Adc();
 
     // TODO : These should go into platform-specific files

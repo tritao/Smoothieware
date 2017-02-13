@@ -45,7 +45,7 @@
 // Debug
 #include "libs/SerialMessage.h"
 
-#if !defined(SIM)
+#if !defined(DISABLEUSB)
 #include "libs/USBDevice/USB.h"
 #include "libs/USBDevice/USBMSD/USBMSD.h"
 #include "libs/USBDevice/USBMSD/SDCard.h"

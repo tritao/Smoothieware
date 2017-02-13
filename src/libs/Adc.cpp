@@ -124,6 +124,7 @@ unsigned int Adc::read(Pin *pin)
 // Convert a smoothie Pin into a mBed Pin
 PinName Adc::_pin_to_pinname(Pin *pin)
 {
+#if !defined(SIM)
     if( pin->port == LPC_GPIO0 && pin->pin == 23 ) {
         return p15;
     } else if( pin->port == LPC_GPIO0 && pin->pin == 24 ) {
@@ -140,5 +141,7 @@ PinName Adc::_pin_to_pinname(Pin *pin)
         //TODO: Error
         return NC;
     }
+#endif
+    return NC;
 }
 
