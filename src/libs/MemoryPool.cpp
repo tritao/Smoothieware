@@ -149,6 +149,11 @@ void* MemoryPool::alloc(size_t nbytes)
 
 void MemoryPool::dealloc(void* d)
 {
+#if defined(SIM)
+    ::free(d);
+    return;
+#endif
+
     _poolregion* p = (_poolregion*) (((uint8_t*) d) - sizeof(_poolregion));
     p->used = 0;
 

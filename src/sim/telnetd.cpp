@@ -57,6 +57,7 @@ void Telnetd::output_prompt(const char *str)
 
 int Telnetd::output(const char *str)
 {
+    socket->Send((const uint8 *) "\r", 1);
     int sent = socket->Send((const uint8 *) str, strlen(str));
     return sent;
 }

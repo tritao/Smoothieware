@@ -10,6 +10,9 @@
 #include "Module.h"
 #include "Pin.h"
 
+#include "Kernel.h"
+#include "StreamOutputPool.h"
+
 class StepperMotor  : public Module {
     public:
         StepperMotor(Pin& step, Pin& dir, Pin& en);

@@ -149,6 +149,9 @@ void Network::thread_main(void)
             int bytes = client->Receive(BUF_SIZE, recv);
             data.insert(data.end(), &recv[0], &recv[bytes]);
 
+            if (bytes == 0)
+                break;
+
             bool newLine = false;
             for (auto i = 0; i < bytes; i++)
                 newLine |= data[data.size() - i - 1] == '\n';
@@ -165,6 +168,9 @@ void Network::thread_main(void)
                 data.clear();
             }
         }
+
+        telnetd->close();
+        delete telnetd;
     }
 }
 
