@@ -12,13 +12,16 @@ int StreamOutput::printf(const char *format, ...)
 
     int size = vsnprintf(b, 64, format, args) + 1; // we add one to take into account space for the terminating \0
 
+    va_end(args);
+    
     if (size < 64) {
         buffer = b;
     } else {
         buffer = new char[size];
+        va_start(args, format);
         vsnprintf(buffer, size, format, args);
+        va_end(args);
     }
-    va_end(args);
 
     puts(buffer);
 
