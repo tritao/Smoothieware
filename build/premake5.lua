@@ -17,39 +17,55 @@ workspace "Smoothieware"
   objdir (path.join(builddir, "obj", "%{cfg.buildcfg}_%{cfg.platform}"))
   targetdir (path.join(builddir, "lib", "%{cfg.buildcfg}_%{cfg.platform}"))
 
+  filter { "system:macosx" }
+    defines { "_SYS_WAIT_H_", "_DARWIN" }
+
+  filter { "system:not windows" }
+    buildoptions { "-std=c++11", "-Wno-format", "-Wno-implicit-exception-spec-mismatch" }
+
+  filter {}
+
+  local smdefines =
+  {
+    "__GITVERSIONSTRING__=\"edge\"",
+    "SIM",
+    "MRI_ENABLE=0",
+    "DEFAULT_SERIAL_BAUD_RATE=9600",
+    "CHECKSUM_USE_CPP",
+    "DISABLESD",
+    "DISABLEMSD",
+    "DISABLEUSB",
+    "NO_TOOLS_ENDSTOPS",
+    "NO_TOOLS_SWITCH",
+    "NO_TOOLS_EXTRUDER",
+    "NO_TOOLS_LASER",
+    "NO_TOOLS_SPINDLE",
+    "NO_UTILS_PANEL",
+    "NO_TOOLS_ZPROBE",
+    "NO_TOOLS_SCARACAL",
+    "NO_TOOLS_ROTARYDELTACALIBRATION",
+    "NO_TOOLS_TEMPERATURECONTROL",
+    "NO_TOOLS_TEMPERATURESWITCH",
+    "NO_TOOLS_DRILLINGCYCLES",
+    "NO_TOOLS_FILAMENTDETECTOR",
+    "NO_UTILS_MOTORDRIVERCONTROL",
+    "NO_TOOLS_SWITCH",
+  }
+
+  defines { smdefines }
+
   project "Smoothieware"
-    kind "ConsoleApp"
+    kind "SharedLib"
     language "C++"
 
-    local smdefines =
-    {
-      "__GITVERSIONSTRING__=\"edge\"",
-      "SIM",
-      "MRI_ENABLE=0",
-      "__INLINE=inline",
-      "__STATIC_INLINE=inline",
-      "DEFAULT_SERIAL_BAUD_RATE=9600",
-      "CHECKSUM_USE_CPP",
-      "DISABLESD",
-      "DISABLEMSD",
-      "DISABLEUSB",
-      "NO_TOOLS_ENDSTOPS",
-      "NO_TOOLS_SWITCH",
-      "NO_TOOLS_EXTRUDER",
-      "NO_TOOLS_LASER",
-      "NO_TOOLS_SPINDLE",
-      "NO_UTILS_PANEL",
-      "NO_TOOLS_ZPROBE",
-      "NO_TOOLS_SCARACAL",
-      "NO_TOOLS_ROTARYDELTACALIBRATION",
-      "NO_TOOLS_TEMPERATURECONTROL",
-      "NO_TOOLS_TEMPERATURESWITCH",
-      "NO_TOOLS_DRILLINGCYCLES",
-      "NO_TOOLS_FILAMENTDETECTOR",
-      "NO_UTILS_MOTORDRIVERCONTROL"
-    }
-
-    defines { smdefines }
+    filter { "system: windows" }
+      defines
+      {
+        "__INLINE=inline",
+        "__STATIC_INLINE=inline"
+      }
+  
+    filter {}
 
     files
     {
@@ -148,8 +164,6 @@ workspace "Smoothieware"
   project "Smoothieware.Tests"
     kind "ConsoleApp"
     language "C++"
-
-    defines { smdefines }
 
     files
     {
