@@ -21,7 +21,7 @@ workspace "Smoothieware"
     defines { "_SYS_WAIT_H_", "_DARWIN" }
 
   filter { "system:not windows" }
-    buildoptions { "-std=c++11", "-Wno-format", "-Wno-implicit-exception-spec-mismatch" }
+    buildoptions { "-std=c++11", "-Wno-implicit-exception-spec-mismatch" }
 
   filter {}
 
@@ -156,7 +156,6 @@ workspace "Smoothieware"
       --prebuildcommands { "..\\..\\src\\generate-version.bat" }
 
     filter "not system:windows"
-
       --prebuildcommands { "../../src/generate-version.sh" }
 
     filter {}
@@ -182,3 +181,11 @@ workspace "Smoothieware"
     filter "system:windows"
       buildoptions "/wd4244 /wd4267 /wd4312 /wd4996"
 
+  project "Smoothie"
+    kind "ConsoleApp"
+    language "C++"
+
+    files { "../src/main.cpp" }
+    includedirs { includes }
+
+    links { "Smoothieware" }
