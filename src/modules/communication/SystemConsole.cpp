@@ -10,6 +10,7 @@ You should have received a copy of the GNU General Public License along with Smo
 #include "libs/SerialMessage.h"
 #include "libs/StreamOutputPool.h"
 #include "linenoise/linenoise.h"
+#include <stdlib.h>
 
 SystemConsole::SystemConsole() {
 }

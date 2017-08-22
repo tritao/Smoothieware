@@ -10,7 +10,7 @@ typedef enum {
     AHB_NUM_BANKS
 } BANK;
 
-#if defined(__GNUC__)
+#if defined(__GNUC__) && !defined(__clang__)
 #define ATTR_WARNING(w) __attribute__ ((warning(w)))
 #else
 #define ATTR_WARNING(w)

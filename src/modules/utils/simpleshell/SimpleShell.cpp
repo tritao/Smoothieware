@@ -47,7 +47,11 @@
 
 extern unsigned int g_maximumHeapAddress;
 
+#if defined(__MACH__)
+#include <stdlib.h>
+#else 
 #include <malloc.h>
+#endif
 #include <mri.h>
 #include <stdio.h>
 #include <stdint.h>
@@ -59,6 +63,10 @@ extern "C" uint32_t  _sbrk(int size);
 
 #if defined(_MSC_VER)
 #define strncasecmp(x,y,z) _strnicmp(x,y,z)
+#endif
+
+#if defined(__MACH__)
+#include <sys/stat.h>
 #endif
 
 // command lookup table
@@ -101,7 +109,7 @@ static uint32_t heapWalk(StreamOutput *stream, bool verbose)
 {
     uint32_t chunkNumber = 1;
     // The __end__ linker symbol points to the beginning of the heap.
-    uint32_t chunkCurr = (uint32_t)&__end__;
+    uint32_t chunkCurr = (uint32_t)reinterpret_cast<uintptr_t>(&__end__);
     // __malloc_free_list is the head pointer to newlib-nano's link list of free chunks.
     uint32_t freeCurr = __malloc_free_list;
     // Calling _sbrk() with 0 reserves no more memory but it returns the current top of heap.

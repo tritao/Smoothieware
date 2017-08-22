@@ -32,7 +32,11 @@
 
 #include "platform_memory.h"
 
+#if defined(__MACH__)
+#include <stdlib.h>
+#else 
 #include <malloc.h>
+#endif
 #include <array>
 #include <string>
 

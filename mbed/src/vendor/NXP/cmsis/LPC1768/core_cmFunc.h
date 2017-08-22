@@ -31,6 +31,13 @@
   @{
  */
 
+#if defined ( SIM )
+
+#define __disable_irq()
+#define __enable_irq()
+
+#else
+
 #if   defined ( __CC_ARM ) /*------------------RealView Compiler -----------------*/
 /* ARM armcc specific functions */
 
@@ -304,7 +311,7 @@ __STATIC_INLINE void __set_FPSCR(uint32_t fpscr)
 #include <cmsis_ccs.h>
 
 
-#elif defined ( __GNUC__ ) /*------------------ GNU Compiler ---------------------*/
+#elif defined ( __GNUC__ ) && !defined ( SIM ) /*------------------ GNU Compiler ---------------------*/
 /* GNU gcc specific functions */
 
 /** \brief  Enable IRQ Interrupts
@@ -608,9 +615,10 @@ __attribute__( ( always_inline ) ) __STATIC_INLINE void __set_FPSCR(uint32_t fps
  * Including the CMSIS ones.
  */
 
+ #endif
+
 #endif
 
 /*@} end of CMSIS_Core_RegAccFunctions */
-
 
 #endif /* __CORE_CMFUNC_H */

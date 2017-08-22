@@ -21,7 +21,11 @@
 
 /* Used to insert hardcoded breakpoint into user's code. */
 #if !defined(__debugbreak) && !defined(_MSC_VER)
+    #if defined(__i386__) || defined(__amd64__)
+    #define __debugbreak()  { __asm volatile ("int $3"); }
+    #else
     #define __debugbreak()  { __asm volatile ("bkpt #0"); }
+    #endif
 #endif
 
 /* Error strings that can be returned to GDB. */

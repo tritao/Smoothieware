@@ -16,11 +16,10 @@ Author: Michael Hackney, mhackney@eclecticangler.com
 #ifndef TEMPERATURESWITCH_MODULE_H
 #define TEMPERATURESWITCH_MODULE_H
 
-using namespace std;
-
 #include "libs/Module.h"
 #include <string>
 #include <vector>
+using namespace std;
 
 class TemperatureSwitch : public Module
 {

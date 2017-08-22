@@ -11,7 +11,11 @@
 #include "ConfigCache.h"
 #include "checksumm.h"
 #include "utils.h"
+#if defined(__MACH__)
+#include <stdlib.h>
+#else 
 #include <malloc.h>
+#endif
 
 using namespace std;
 #include <string>

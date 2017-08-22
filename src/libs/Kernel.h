@@ -8,12 +8,6 @@
 #ifndef KERNEL_H
 #define KERNEL_H
 
-#if defined(SIM)
-#define __disable_irq()
-#define __enable_irq()
-#define serial_irq_set(a, b, c)
-#endif
-
 #define THEKERNEL Kernel::instance
 #define THECONVEYOR THEKERNEL->conveyor
 #define THEROBOT THEKERNEL->robot

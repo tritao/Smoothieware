@@ -16,7 +16,7 @@
 #ifndef MBED_DIRHANDLE_H
 #define MBED_DIRHANDLE_H
 
-#if defined(__ARMCC_VERSION) || defined(__ICCARM__) || defined(SIM)
+#if defined(__ARMCC_VERSION) || defined(__ICCARM__) || defined(_WIN32)
 #   define NAME_MAX 255
 typedef int mode_t;
 
