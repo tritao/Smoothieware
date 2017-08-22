@@ -1,3 +1,5 @@
+#if !defined(NO_TOOLS_TEMPERATURESWITCH)
+
 #include "TemperatureSwitch.h"
 #include "Kernel.h"
 #include "checksumm.h"
@@ -263,3 +265,5 @@ TESTF(TemperatureSwitch,edge_high_low)
     // make sure it is not armed anymore
     ASSERT_TRUE(!nts->is_armed());
 }
+
+#endif

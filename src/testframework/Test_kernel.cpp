@@ -65,10 +65,12 @@ Kernel::Kernel(){
     // dummies (would be nice to refactor to not have to create a conveyor)
     this->conveyor= new Conveyor();
 
+#if !defined(SIM)
     // Configure UART depending on MRI config
     // Match up the SerialConsole to MRI UART. This makes it easy to use only one UART for both debug and actual commands.
     NVIC_SetPriorityGrouping(0);
     NVIC_SetPriority(UART0_IRQn, 5);
+#endif
 }
 
 // Add a module to Kernel. We don't actually hold a list of modules we just call its on_module_loaded
@@ -116,7 +118,9 @@ void Kernel::unregister_for_event(_EVENT_ENUM id_event, Module *mod)
 
 void test_kernel_setup_config(const char* start, const char* end)
 {
+#if !defined(SIM)
     THEKERNEL->config= new Config(new FirmConfigSource("rom", start, end) );
+#endif
     // Pre-load the config cache
     THEKERNEL->config->config_cache_load();
 }

@@ -1,3 +1,5 @@
+#if !defined(NO_TOOLS_SWITCH)
+
 #include "Kernel.h"
 #include "checksumm.h"
 #include "utils.h"
@@ -88,3 +90,5 @@ TESTF(Switch,set_on_off_with_gcode)
     ASSERT_TRUE(get_switch_state(ts, s));
     ASSERT_TRUE(!s.state);
 }
+
+#endif

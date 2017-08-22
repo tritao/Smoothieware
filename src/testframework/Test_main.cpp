@@ -27,9 +27,11 @@ int main( )
 
     kernel->serial->printf("Done\n");
 
+#if !defined(SIM)
     // drop back into DFU upload
     kernel->serial->printf("Entering DFU flash mode...\n");
     system_reset(true);
 
     for(;;) {}
+#endif
 }

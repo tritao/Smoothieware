@@ -158,6 +158,7 @@ bool file_exists( const string file_name )
 // Prepares and executes a watchdog reset for dfu or reboot
 void system_reset( bool dfu )
 {
+#if !defined(SIM)
     if(dfu) {
         LPC_WDT->WDCLKSEL = 0x1;                // Set CLK src to PCLK
         uint32_t clk = SystemCoreClock / 16;    // WD has a fixed /4 prescaler, PCLK default is /4
@@ -168,6 +169,10 @@ void system_reset( bool dfu )
     } else {
         NVIC_SystemReset();
     }
+#else
+    // TODO: Send system reset event.
+    puts("System reset!!!");
+#endif
 }
 
 // Convert a path indication ( absolute or relative ) into a path ( absolute )
