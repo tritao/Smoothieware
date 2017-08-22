@@ -24,3 +24,4 @@ debug
 /src/default_excludes.mk
 /build/gmake
 /build/vs2015
+/build/:0x*
